@@ -148,7 +148,8 @@ class PuzzleSolver {
         return true;
     }
 
-    // BFS Algorithm (you'll expand this with A* and IDA*)
+    // BFS Algorithm (probably expand this thingy with wtv stuff is good lmao)
+
     solveBFS() {
         if (this.isSolving) return;
         
