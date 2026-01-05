@@ -10,80 +10,275 @@
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-puzzle-piece"></i> Sliding Tile Puzzle Solver</h1>
-            <p>Create any N×N puzzle and watch it solve automatically!</p>
+            <h1><i class="fas fa-puzzle-piece"></i> Advanced Sliding Puzzle Solver</h1>
+            <p>Fully editable puzzle - click any tile to change it! Zero is included as a tile.</p>
         </header>
 
         <div class="controls">
-            <div class="input-group">
-                <label for="puzzle-size">Puzzle Size:</label>
-                <input type="number" id="puzzle-size" min="2" max="10" value="3">
-                <button id="generate-btn" class="btn">
-                    <i class="fas fa-sync-alt"></i> Generate New Puzzle
-                </button>
-            </div>
-            
-            <div class="input-group">
-                <label for="custom-puzzle">Or enter custom layout (comma-separated, 0 for empty):</label>
-                <input type="text" id="custom-puzzle" placeholder="1,2,3,4,5,6,7,8,0">
-                <button id="custom-btn" class="btn">
-                    <i class="fas fa-edit"></i> Load Custom
-                </button>
+            <div class="control-section">
+                <h3><i class="fas fa-cog"></i> Puzzle Configuration</h3>
+                
+                <div class="input-group">
+                    <label for="puzzle-size">Grid Size (N×N):</label>
+                    <div class="range-container">
+                        <input type="range" id="size-slider" min="2" max="8" value="3">
+                        <span id="size-value">3</span>
+                    </div>
+                    <button id="resize-btn" class="btn">
+                        <i class="fas fa-expand-alt"></i> Resize Grid
+                    </button>
+                </div>
+                
+                <div class="input-group">
+                    <label>Quick Setup:</label>
+                    <div class="button-row">
+                        <button id="btn-solved" class="btn small">
+                            <i class="fas fa-check-circle"></i> Solved State
+                        </button>
+                        <button id="btn-random" class="btn small">
+                            <i class="fas fa-random"></i> Random
+                        </button>
+                        <button id="btn-clear" class="btn small">
+                            <i class="fas fa-broom"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="custom-input">Custom Layout Input:</label>
+                    <div class="input-with-example">
+                        <input type="text" id="custom-input" 
+                               placeholder="e.g., 1,2,3,4,5,6,7,8,0 or 1 2 3 4 5 6 7 8 0">
+                        <div class="example">Example for 3×3: "1,2,3,4,5,6,7,8,0"</div>
+                    </div>
+                    <div class="button-row">
+                        <button id="btn-load" class="btn small">
+                            <i class="fas fa-upload"></i> Load from Text
+                        </button>
+                        <button id="btn-export" class="btn small">
+                            <i class="fas fa-download"></i> Export Current
+                        </button>
+                        <button id="btn-import" class="btn small">
+                            <i class="fas fa-file-import"></i> Import JSON
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <div class="button-group">
-                <button id="solve-btn" class="btn solve-btn">
-                    <i class="fas fa-robot"></i> Solve Puzzle
-                </button>
-                <button id="shuffle-btn" class="btn">
-                    <i class="fas fa-random"></i> Shuffle
-                </button>
-                <button id="reset-btn" class="btn">
-                    <i class="fas fa-undo"></i> Reset
-                </button>
-            </div>
+            <div class="control-section">
+                <h3><i class="fas fa-robot"></i> Solver Configuration</h3>
+                
+                <div class="input-group">
+                    <label for="algorithm">Solving Algorithm:</label>
+                    <select id="algorithm">
+                        <option value="bfs">Breadth-First Search (BFS)</option>
+                        <option value="a-star">A* Algorithm (Recommended)</option>
+                        <option value="ida-star">IDA* (Memory Efficient)</option>
+                        <option value="manual">Manual Solve Only</option>
+                    </select>
+                </div>
 
-            <div class="algorithm-select">
-                <label for="algorithm">Solving Algorithm:</label>
-                <select id="algorithm">
-                    <option value="bfs">Breadth-First Search</option>
-                    <option value="a-star">A* Algorithm (Manhattan Distance)</option>
-                    <option value="ida-star">IDA* (Iterative Deepening A*)</option>
-                </select>
+                <div class="button-group">
+                    <button id="btn-solve" class="btn primary">
+                        <i class="fas fa-play"></i> Solve Puzzle
+                    </button>
+                    <button id="btn-step" class="btn">
+                        <i class="fas fa-forward"></i> Solve Step by Step
+                    </button>
+                    <button id="btn-stop" class="btn danger">
+                        <i class="fas fa-stop"></i> Stop Solver
+                    </button>
+                </div>
+
+                <div class="input-group">
+                    <label>Solver Options:</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox">
+                            <input type="checkbox" id="chk-animate" checked>
+                            <span class="checkmark"></span>
+                            Animate Solution
+                        </label>
+                        <label class="checkbox">
+                            <input type="checkbox" id="chk-showsteps" checked>
+                            <span class="checkmark"></span>
+                            Show Solution Steps
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="puzzle-container">
-            <div id="puzzle-board"></div>
+            <div class="puzzle-header">
+                <h3><i class="fas fa-th"></i> Interactive Puzzle Board</h3>
+                <div class="instructions">
+                    <i class="fas fa-mouse-pointer"></i> Click any tile to edit its value
+                    <span class="separator">|</span>
+                    <i class="fas fa-arrows-alt"></i> Click adjacent to empty tile to move
+                    <span class="separator">|</span>
+                    <i class="fas fa-edit"></i> Double-click to edit directly
+                </div>
+            </div>
+            
+            <div id="puzzle-board" class="editable-board"></div>
+            
+            <div class="editor-controls">
+                <div class="editor-input">
+                    <input type="number" id="tile-edit-value" min="0" max="99" placeholder="Enter value">
+                    <button id="btn-set-tile" class="btn small">
+                        <i class="fas fa-check"></i> Set Selected
+                    </button>
+                    <button id="btn-find-empty" class="btn small">
+                        <i class="fas fa-search"></i> Find Empty (0)
+                    </button>
+                </div>
+                <div class="selected-tile-info">
+                    Selected: <span id="selected-coords">None</span>
+                    Value: <span id="selected-value">-</span>
+                </div>
+            </div>
+
             <div class="stats">
-                <div class="stat">
-                    <i class="fas fa-expand-arrows-alt"></i>
-                    <span>Size: <span id="current-size">3×3</span></span>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-expand-arrows-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Grid Size</div>
+                        <div class="stat-value" id="stat-size">3×3</div>
+                    </div>
                 </div>
-                <div class="stat">
-                    <i class="fas fa-step-forward"></i>
-                    <span>Moves: <span id="move-count">0</span></span>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-step-forward"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Moves Made</div>
+                        <div class="stat-value" id="stat-moves">0</div>
+                    </div>
                 </div>
-                <div class="stat">
-                    <i class="fas fa-clock"></i>
-                    <span>Time: <span id="timer">0s</span></span>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Time Elapsed</div>
+                        <div class="stat-value" id="stat-time">0s</div>
+                    </div>
                 </div>
-                <div class="stat">
-                    <i class="fas fa-brain"></i>
-                    <span>Status: <span id="status">Ready</span></span>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Solver Status</div>
+                        <div class="stat-value" id="stat-status">Ready</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Validation</div>
+                        <div class="stat-value" id="stat-valid">✓ Valid</div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="solution-panel" id="solution-panel">
-            <h3><i class="fas fa-list-ol"></i> Solution Steps</h3>
-            <div id="solution-steps"></div>
+            <div class="panel-header">
+                <h3><i class="fas fa-list-ol"></i> Solution Steps</h3>
+                <div class="panel-controls">
+                    <button id="btn-copy-solution" class="btn small">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                    <button id="btn-clear-solution" class="btn small">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+            </div>
+            <div class="solution-content">
+                <div id="solution-steps" class="solution-steps">
+                    <div class="empty-state">
+                        <i class="fas fa-lightbulb"></i>
+                        <p>Solution will appear here after solving</p>
+                    </div>
+                </div>
+                <div class="solution-stats" id="solution-stats">
+                    <!-- Solver statistics will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="validation-panel" id="validation-panel">
+            <h3><i class="fas fa-check-circle"></i> Puzzle Validation</h3>
+            <div id="validation-messages">
+                <div class="validation-item valid">
+                    <i class="fas fa-check"></i>
+                    <span>Puzzle is valid and solvable</span>
+                </div>
+            </div>
         </div>
 
         <footer>
-            <p>Built with JavaScript | Hosted on GitHub Pages</p>
-            <p>Algorithm: BFS/A*/IDA* | Supports any N×N puzzle</p>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4><i class="fas fa-info-circle"></i> How to Use</h4>
+                    <p>1. Click any tile to select it, then enter a new value (0 for empty)</p>
+                    <p>2. Click adjacent to empty tile to slide pieces</p>
+                    <p>3. Use custom input to load any configuration</p>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-code"></i> Features</h4>
+                    <p>✓ Fully editable tiles (including zero)</p>
+                    <p>✓ Multiple solving algorithms</p>
+                    <p>✓ Import/Export puzzle states</p>
+                    <p>✓ Real-time validation</p>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-share-alt"></i> Share</h4>
+                    <p>Built with JavaScript • Hosted on GitHub Pages</p>
+                    <div class="github-link">
+                        <i class="fab fa-github"></i>
+                        <a href="#" id="github-repo-link">View Source on GitHub</a>
+                    </div>
+                </div>
+            </div>
         </footer>
+    </div>
+
+    <!-- Tile Editor Modal -->
+    <div id="tile-editor-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Tile Value</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Editing tile at position: <span id="modal-coords">(0, 0)</span></p>
+                <div class="modal-input">
+                    <input type="number" id="modal-tile-value" min="0" max="99" 
+                           placeholder="Enter value (0 for empty)" autofocus>
+                    <div class="quick-values">
+                        <button class="quick-value" data-value="0">Empty (0)</button>
+                        <button class="quick-value" data-value="1">1</button>
+                        <button class="quick-value" data-value="2">2</button>
+                        <button class="quick-value" data-value="3">3</button>
+                        <button class="quick-value" data-value="4">4</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-cancel" class="btn secondary">Cancel</button>
+                <button id="modal-save" class="btn primary">Save Changes</button>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
